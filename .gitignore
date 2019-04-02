@@ -10,3 +10,9 @@
 /build
 /captures
 .externalNativeBuild
+/gradle.properties
+/gradlew
+/gradlew.bat
+/app/ideas.txt
+/gradle/
+/.idea/misc.xml
