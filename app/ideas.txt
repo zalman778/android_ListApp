@@ -1,0 +1,3 @@
+1) in filmDetail set background from backdropPath
+2) update on pull down
+3) add objects to list on pull down

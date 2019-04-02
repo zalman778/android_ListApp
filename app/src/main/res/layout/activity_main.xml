@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.hwx.listApplication.view.activity.MainActivity">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="mainViewModel"
+            type="com.hwx.listApplication.viewModel.MainViewModel" />
+    </data>
+
+    <android.support.v4.widget.DrawerLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorWhite"
+        app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior"
+        >
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior"
+            android:fitsSystemWindows="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:visibility="@{mainViewModel.progressBar}" />
+
+
+
+
+
+
+                    <TextView
+                        android:id="@+id/label_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@{mainViewModel.statusLabelText}"
+                        app:visibility="@{mainViewModel.statusLabelVisibility}" />
+
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/list_films"
+                    android:layout_width="match_parent"
+                    android:layout_height="653dp"
+                    android:background="@color/colorWhite"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:layout_marginTop="70dp"
+                    app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior"
+                    app:visibility="@{mainViewModel.objectsRecyclerVisibility}"
+                    tools:listitem="@layout/activity_film_simple" />
+
+
+            </LinearLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:rippleColor="@null"
+                app:backgroundTint="@null"
+                app:fabSize="mini"
+                android:onClick="@{mainViewModel::onClick}"
+                android:src="@drawable/ic_refresh"
+                android:visibility="visible" />
+
+
+
+        </android.support.design.widget.CoordinatorLayout>
+
+    </android.support.v4.widget.DrawerLayout>
+
+</layout>

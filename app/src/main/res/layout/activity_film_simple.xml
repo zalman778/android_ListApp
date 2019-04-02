@@ -1,0 +1,62 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+
+
+        <variable
+            name="filmSimpleViewModel"
+            type="com.hwx.listApplication.viewModel.FilmSimpleViewModel"/>
+    </data>
+
+    <android.support.v7.widget.CardView
+        app:cardElevation="5dp"
+        android:layout_margin="16dp"
+        android:id="@+id/film_simple_object"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:onClick="@{filmSimpleViewModel::onItemClick}"
+        android:padding="1dp"
+        android:focusable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/image_people"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                tools:imageUrl="@{filmSimpleViewModel.imageUrl}"
+
+                />
+
+            <TextView
+                android:id="@+id/label_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/spacing_medium"
+                android:text="@{filmSimpleViewModel.caption}"
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tools:text="film caption 1"
+                tools:ignore="RtlCompat" />
+
+
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</layout>

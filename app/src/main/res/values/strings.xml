@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ListApplication</string>
+    <string name="init_text">Нажмите на кнопку, чтобы получить данные</string>
+    <string name="update_error">Ошибка получения данных!</string>
+</resources>
