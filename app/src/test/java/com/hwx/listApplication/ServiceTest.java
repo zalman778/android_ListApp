@@ -4,6 +4,7 @@ package com.hwx.listApplication;
 import android.content.Context;
 
 import com.hwx.listApplication.model.ObjectListResponse;
+import com.hwx.listApplication.service.ApiFactory;
 import com.hwx.listApplication.service.FilmService;
 
 import org.junit.Assert;
@@ -21,8 +22,8 @@ import static org.mockito.Mockito.when;
 
 public class ServiceTest {
 
-    @Mock
-    Context context;
+//    @Mock
+//    Context context;
 
     @Before
     public void init(){
@@ -32,9 +33,9 @@ public class ServiceTest {
 
     @Test
     public void checkFilmsListJson() {
-        when(context.getApplicationContext()).thenReturn(new AppController());
-        AppController appController = AppController.create(context);
-        FilmService filmService = appController.getFilmService();
+        //when(context.getApplicationContext()).thenReturn(new AppController());
+        //AppController appController = ApiFactory.create();
+        FilmService filmService = ApiFactory.create();
 
         TestSubscriber<ObjectListResponse> testSubscriber = new TestSubscriber<>();
 
@@ -54,9 +55,9 @@ public class ServiceTest {
 
     @Test
     public void checkFilmDetailJson() {
-        when(context.getApplicationContext()).thenReturn(new AppController());
-        AppController appController = AppController.create(context);
-        FilmService filmService = appController.getFilmService();
+        //when(context.getApplicationContext()).thenReturn(new AppController());
+        //AppController appController = AppController.create(context);
+        FilmService filmService = ApiFactory.create();
 
         TestSubscriber<ObjectListResponse> testSubscriber = new TestSubscriber<>();
 

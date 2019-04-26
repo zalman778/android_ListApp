@@ -3,19 +3,17 @@ package com.hwx.listApplication.view.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.hwx.listApplication.Configuration;
 import com.hwx.listApplication.R;
 import com.hwx.listApplication.databinding.ActivityFilmDetailBinding;
@@ -45,15 +43,17 @@ public class FilmDetailActivity extends AppCompatActivity {
         //loading background image into appbarlayout;
         //activityFilmDetailBinding.appBarLayout
         Glide.with(this)
-                .load(Configuration.getImageFullUrl(filmDetail.backdropPath))
                 .asBitmap()
+                .load(Configuration.getImageFullUrl(filmDetail.backdropPath))
+
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         Drawable drawable = new BitmapDrawable(context.getResources(), resource);
                         //yourRelativeLayout.setBackground(drawable);
                         activityFilmDetailBinding.appBarLayout.setBackground(drawable);
                     }
+
         });
 
     }

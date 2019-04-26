@@ -1,18 +1,18 @@
 package com.hwx.listApplication.viewModel;
 
-import android.content.Context;
+
 import android.databinding.BaseObservable;
 import android.databinding.BindingAdapter;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.hwx.listApplication.AppController;
 import com.hwx.listApplication.Configuration;
 import com.hwx.listApplication.model.FilmDetail;
 import com.hwx.listApplication.model.FilmSimple;
+import com.hwx.listApplication.service.ApiFactory;
 import com.hwx.listApplication.service.FilmService;
-import com.hwx.listApplication.view.activity.FilmDetailActivity;
+import com.livedata.SingleLiveEvent;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -21,7 +21,16 @@ import retrofit2.Response;
 public class FilmSimpleViewModel extends BaseObservable {
 
     private FilmSimple filmSimple;
-    private Context context;
+
+    private SingleLiveEvent uiEventLiveData;
+
+    public SingleLiveEvent getUiEventLiveData() {
+        return uiEventLiveData;
+    }
+
+    public void setUiEventLiveData(SingleLiveEvent uiEventLiveData) {
+        this.uiEventLiveData = uiEventLiveData;
+    }
 
     public String getCaption() {
         return filmSimple.title;
@@ -38,11 +47,10 @@ public class FilmSimpleViewModel extends BaseObservable {
 
     //вызывается при выборе карточки фильма из списка
     public void onItemClick(final View v){
-        System.out.println("got click to open "+filmSimple.id);
+        //System.out.println("got click to open "+filmSimple.id);
 
 
-        AppController appController = AppController.create(context);
-        FilmService filmOldService = appController.getFilmService();
+        FilmService filmOldService = ApiFactory.create();
 
 
         //checking via Call:
@@ -50,7 +58,8 @@ public class FilmSimpleViewModel extends BaseObservable {
                 .enqueue(new Callback<FilmDetail>() {
                     @Override
                     public void onResponse(Call<FilmDetail> call, Response<FilmDetail> response) {
-                        context.startActivity(FilmDetailActivity.fillDetail(v.getContext(), response.body()));
+                        //context.startActivity(FilmDetailActivity.fillDetail(v.getContext(), response.body()));
+                        uiEventLiveData.setValue(response.body());
                     }
 
                     @Override
@@ -67,9 +76,9 @@ public class FilmSimpleViewModel extends BaseObservable {
         Glide.with(imageView.getContext()).load(url).into(imageView);
     }
 
-    public FilmSimpleViewModel(FilmSimple filmSimple, Context context) {
+    public FilmSimpleViewModel(FilmSimple filmSimple) {
         this.filmSimple = filmSimple;
-        this.context = context;
+        uiEventLiveData = new SingleLiveEvent<FilmDetail>();
     }
 
     public void setFilmSimple(FilmSimple filmSimple) {

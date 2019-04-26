@@ -1,15 +1,14 @@
 package com.hwx.listApplication.viewModel;
 
-import android.content.Context;
+
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.view.View;
 
-import com.hwx.listApplication.AppController;
 import com.hwx.listApplication.Configuration;
-import com.hwx.listApplication.R;
 import com.hwx.listApplication.model.FilmSimple;
 import com.hwx.listApplication.model.ObjectListResponse;
+import com.hwx.listApplication.service.ApiFactory;
 import com.hwx.listApplication.service.FilmService;
 
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainViewModel extends Observable {
 
@@ -33,16 +33,15 @@ public class MainViewModel extends Observable {
     }
 
     private List<FilmSimple> filmSimpleList;
-    private Context context;
+
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public MainViewModel(Context context) {
-        this.context = context;
+    public MainViewModel() {
         this.filmSimpleList = new ArrayList<>();
         progressBar = new ObservableInt(View.GONE);
         statusLabelVisibility = new ObservableInt(View.VISIBLE);
         objectsRecyclerVisibility = new ObservableInt(View.GONE);
-        statusLabelText = new ObservableField<>(context.getString(R.string.init_text));
+        statusLabelText = new ObservableField<>("Нажмите на кнопку, чтобы получить данные");
     }
 
     public void onClick(View view) {
@@ -61,13 +60,13 @@ public class MainViewModel extends Observable {
     }
 
     private void fetchObjectsList() {
-        AppController appController = AppController.create(context);
-        FilmService filmService = appController.getFilmService();
+        FilmService filmService = ApiFactory.create();
 
 
 
-        Disposable disposable = filmService.fetchFilmsList(Configuration.getBaseUrlList(1))
-                .subscribeOn(appController.subscribeScheduler())
+        Disposable disposable = filmService
+                .fetchFilmsList(Configuration.getBaseUrlList(1))
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ObjectListResponse>() {
                     @Override
@@ -80,7 +79,7 @@ public class MainViewModel extends Observable {
 
                 }, new Consumer<Throwable>() {
                 @Override public void accept(Throwable throwable) throws Exception {
-                    statusLabelText.set(context.getString(R.string.update_error));
+                    statusLabelText.set("Ошибка получения данных!");
                     progressBar.set(View.GONE);
                     statusLabelVisibility.set(View.VISIBLE);
                     objectsRecyclerVisibility.set(View.GONE);
@@ -98,7 +97,6 @@ public class MainViewModel extends Observable {
     public void reset() {
         unSubscribeFromObservable();
         compositeDisposable = null;
-        context = null;
     }
 
     private void unSubscribeFromObservable() {

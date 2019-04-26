@@ -12,7 +12,8 @@ public class FilmDetailViewModel {
     private FilmDetail filmDetail;
 
 
-    public FilmDetailViewModel(FilmDetail filmDetail) {
+    public FilmDetailViewModel(
+            FilmDetail filmDetail) {
         this.filmDetail = filmDetail;
     }
 

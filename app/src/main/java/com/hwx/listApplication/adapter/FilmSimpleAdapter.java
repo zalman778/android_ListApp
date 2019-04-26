@@ -1,30 +1,44 @@
 package com.hwx.listApplication.adapter;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.hwx.listApplication.R;
 import com.hwx.listApplication.databinding.ActivityFilmSimpleBinding;
+import com.hwx.listApplication.model.FilmDetail;
 import com.hwx.listApplication.model.FilmSimple;
 import com.hwx.listApplication.viewModel.FilmSimpleViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.subjects.PublishSubject;
+
 public class FilmSimpleAdapter extends RecyclerView.Adapter<FilmSimpleAdapter.FilmSimpleViewHolder> {
 
     private List<FilmSimple> filmSimpleList;
+    private PublishSubject<FilmDetail> publishSubject;
+    private LifecycleOwner lifecycleOwner;
+
 
     public void setFilmSimpleList(List<FilmSimple> filmSimpleList) {
         this.filmSimpleList = filmSimpleList;
         notifyDataSetChanged();
     }
 
-    public FilmSimpleAdapter() {
+    public FilmSimpleAdapter(
+              PublishSubject<FilmDetail> publishSubject
+            , LifecycleOwner lifecycleOwner
+    ) {
         this.filmSimpleList = new ArrayList<>();
+        this.publishSubject = publishSubject;
+        this.lifecycleOwner = lifecycleOwner;
     }
 
     @NonNull
@@ -44,7 +58,7 @@ public class FilmSimpleAdapter extends RecyclerView.Adapter<FilmSimpleAdapter.Fi
 
     @Override
     public void onBindViewHolder(@NonNull FilmSimpleViewHolder filmSimpleViewHolder, int i) {
-        filmSimpleViewHolder.bindFilmSimple(filmSimpleList.get(i));
+        filmSimpleViewHolder.bindFilmSimple(filmSimpleList.get(i), publishSubject, lifecycleOwner);
     }
 
     public static class FilmSimpleViewHolder extends RecyclerView.ViewHolder {
@@ -56,9 +70,21 @@ public class FilmSimpleAdapter extends RecyclerView.Adapter<FilmSimpleAdapter.Fi
             this.filmSimpleObjectBinding = filmSimpleObjectBinding;
         }
 
-        void bindFilmSimple(FilmSimple filmSimple) {
+        void bindFilmSimple(
+                FilmSimple filmSimple
+                , final PublishSubject<FilmDetail> publishSubject
+                , LifecycleOwner lifecycleOwner
+        ) {
             if (filmSimpleObjectBinding.getFilmSimpleViewModel() == null) {
-                filmSimpleObjectBinding.setFilmSimpleViewModel(new FilmSimpleViewModel(filmSimple, itemView.getContext()));
+                FilmSimpleViewModel filmSimpleViewModel = new FilmSimpleViewModel(filmSimple);
+                filmSimpleViewModel.getUiEventLiveData().observe(lifecycleOwner, new Observer() {
+                    @Override
+                    public void onChanged(@Nullable Object o) {
+                        publishSubject.onNext((FilmDetail)o);
+                    }
+                });
+
+                filmSimpleObjectBinding.setFilmSimpleViewModel(filmSimpleViewModel);
             } else {
                 filmSimpleObjectBinding.getFilmSimpleViewModel().setFilmSimple(filmSimple);
             }
