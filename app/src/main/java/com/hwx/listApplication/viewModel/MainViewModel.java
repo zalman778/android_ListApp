@@ -13,15 +13,17 @@ import com.hwx.listApplication.service.FilmService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
-public class MainViewModel extends Observable {
+public class MainViewModel {
+
+    private PublishSubject publishSubject;
 
     public ObservableInt progressBar;
     public ObservableInt statusLabelVisibility;
@@ -32,17 +34,29 @@ public class MainViewModel extends Observable {
         return filmSimpleList;
     }
 
+    public PublishSubject getPublishSubject() {
+        return publishSubject;
+    }
+
+    public void setPublishSubject(PublishSubject publishSubject) {
+        this.publishSubject = publishSubject;
+    }
+
     private List<FilmSimple> filmSimpleList;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public MainViewModel() {
+        publishSubject = PublishSubject.create();
+
         this.filmSimpleList = new ArrayList<>();
         progressBar = new ObservableInt(View.GONE);
         statusLabelVisibility = new ObservableInt(View.VISIBLE);
         objectsRecyclerVisibility = new ObservableInt(View.GONE);
         statusLabelText = new ObservableField<>("Нажмите на кнопку, чтобы получить данные");
     }
+
+
 
     public void onClick(View view) {
         reloadData();
@@ -90,8 +104,8 @@ public class MainViewModel extends Observable {
 
     private void updateFilmsSimpleDataList(List<FilmSimple> filmSimpleList) {
         this.filmSimpleList.addAll(filmSimpleList);
-        setChanged();
-        notifyObservers();
+        publishSubject.onNext(this.filmSimpleList);
+
     }
 
     public void reset() {
