@@ -55,7 +55,7 @@ public class FilmDetailActivity extends AppCompatActivity {
                     }
 
         });
-
+        activityFilmDetailBinding.executePendingBindings();
     }
 
     public static Intent fillDetail(Context context, FilmDetail filmDetail) {

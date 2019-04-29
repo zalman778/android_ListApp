@@ -1,5 +1,6 @@
 package com.hwx.listApplication.view.activity;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
 public class MainActivity extends AppCompatActivity implements Observer {
@@ -29,41 +31,24 @@ public class MainActivity extends AppCompatActivity implements Observer {
         initDataBinding();
 
         activityMainBinding.listFilms.setLayoutManager(new LinearLayoutManager(this));
+
+        //rx
         PublishSubject<FilmDetail> publishSubject = PublishSubject.create();
-
-        publishSubject.subscribeActual(new io.reactivex.Observer<FilmDetail>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(FilmDetail filmDetail) {
-               startActivity(FilmDetailActivity.fillDetail(MainActivity.this, filmDetail));
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
+        publishSubject.subscribeActual(this);
 
         FilmSimpleAdapter filmSimpleAdapter = new FilmSimpleAdapter(publishSubject, this);
         activityMainBinding.listFilms.setAdapter(filmSimpleAdapter);
 
-        mainViewModel.getPublishSubject().subscribeActual(this);
+
+        mainViewModel.getSubjFilmQuery().subscribeActual(this);
+        activityMainBinding.executePendingBindings();
 
     }
 
 
 
     private void initDataBinding() {
-        mainViewModel = new MainViewModel();
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         activityMainBinding.setLifecycleOwner(this);
         activityMainBinding.setMainViewModel(mainViewModel);
@@ -77,6 +62,15 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mainViewModel.reset();
         activityMainBinding.listFilms.setAdapter(null);
         activityMainBinding = null;
+        //отписка не срабатывает почему-то
+        mainViewModel.getSubjFilmQuery().unsubscribeOn(Schedulers.io());
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mainViewModel.onResume();
     }
 
     @Override
@@ -85,8 +79,21 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     @Override
     public void onNext(Object o) {
-        FilmSimpleAdapter filmSimpleAdapter = (FilmSimpleAdapter) activityMainBinding.listFilms.getAdapter();
-        filmSimpleAdapter.setFilmSimpleList((List<FilmSimple>)o);
+        //обрабатываем события он момента завершения загрузки данных и от выбора фильма из списка
+        //надо исправить, почему-то после повотора старая активити получает событие, а у неё уже пустой список.
+        if (o instanceof List) {
+            if (activityMainBinding != null) {
+                FilmSimpleAdapter filmSimpleAdapter = (FilmSimpleAdapter) activityMainBinding.listFilms.getAdapter();
+                filmSimpleAdapter.setFilmSimpleList((List<FilmSimple>) o);
+            }
+        }
+
+        if (o instanceof FilmDetail)
+            startActivity(FilmDetailActivity.fillDetail(MainActivity.this, (FilmDetail)o));
+
+        if (o instanceof String && ((String)o).equals("show_loader")) {
+
+        }
     }
 
     @Override
@@ -99,8 +106,5 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     }
 
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
 
-    }
 }

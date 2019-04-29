@@ -2,6 +2,7 @@ package com.hwx.listApplication.viewModel;
 
 
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.view.View;
 
 import com.hwx.listApplication.Configuration;
@@ -20,34 +21,24 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
-public class MainViewModel {
+public class MainViewModel extends ViewModel {
 
-    private PublishSubject publishSubject;
+
 
     public MutableLiveData<Integer> progressBar;
     public MutableLiveData<Integer> statusLabelVisibility;
     public MutableLiveData<Integer> objectsRecyclerVisibility;
     public MutableLiveData<String> statusLabelText;
 
-
-    public List<FilmSimple> getFilmSimpleList() {
-        return filmSimpleList;
-    }
-
-    public PublishSubject getPublishSubject() {
-        return publishSubject;
-    }
-
-    public void setPublishSubject(PublishSubject publishSubject) {
-        this.publishSubject = publishSubject;
-    }
-
     private List<FilmSimple> filmSimpleList;
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private CompositeDisposable compositeDisposable;
+
+    private PublishSubject subjFilmQuery;  //Observable для запроса списка фильма
 
     public MainViewModel() {
-        publishSubject = PublishSubject.create();
+        subjFilmQuery = PublishSubject.create();
+
         filmSimpleList = new ArrayList<>();
 
         progressBar =  new MutableLiveData<>();
@@ -59,11 +50,23 @@ public class MainViewModel {
         objectsRecyclerVisibility = new MutableLiveData<>();
         objectsRecyclerVisibility.setValue(View.GONE);
 
+        compositeDisposable = new CompositeDisposable();
+
         statusLabelText = new MutableLiveData<>();
         statusLabelText.setValue("Нажмите на кнопку, чтобы получить данные");
     }
 
+    public List<FilmSimple> getFilmSimpleList() {
+        return filmSimpleList;
+    }
 
+    public PublishSubject getSubjFilmQuery() {
+        return subjFilmQuery;
+    }
+
+    public void setSubjFilmQuery(PublishSubject subjFilmQuery) {
+        this.subjFilmQuery = subjFilmQuery;
+    }
 
     public void onClick(View view) {
         reloadData();
@@ -109,15 +112,15 @@ public class MainViewModel {
         compositeDisposable.add(disposable);
     }
 
-    private void updateFilmsSimpleDataList(List<FilmSimple> filmSimpleList) {
-        this.filmSimpleList.addAll(filmSimpleList);
-        publishSubject.onNext(this.filmSimpleList);
+    private void updateFilmsSimpleDataList(List<FilmSimple> pFilmSimpleList) {
+        filmSimpleList.addAll(pFilmSimpleList);
+        subjFilmQuery.onNext(filmSimpleList);
 
     }
 
     public void reset() {
-        unSubscribeFromObservable();
-        compositeDisposable = null;
+        //unSubscribeFromObservable();
+        //compositeDisposable = null;
     }
 
     private void unSubscribeFromObservable() {
@@ -127,4 +130,8 @@ public class MainViewModel {
     }
 
 
+    public void onResume() {
+        if (filmSimpleList.size() > 0)
+            subjFilmQuery.onNext(filmSimpleList);
+    }
 }
