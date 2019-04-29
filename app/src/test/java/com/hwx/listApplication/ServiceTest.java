@@ -1,8 +1,6 @@
 package com.hwx.listApplication;
 
 
-import android.content.Context;
-
 import com.hwx.listApplication.model.ObjectListResponse;
 import com.hwx.listApplication.service.ApiFactory;
 import com.hwx.listApplication.service.FilmService;
@@ -10,14 +8,11 @@ import com.hwx.listApplication.service.FilmService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.subscribers.TestSubscriber;
-
-import static org.mockito.Mockito.when;
 
 
 public class ServiceTest {

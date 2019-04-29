@@ -1,8 +1,7 @@
 package com.hwx.listApplication.viewModel;
 
 
-import android.databinding.ObservableField;
-import android.databinding.ObservableInt;
+import android.arch.lifecycle.MutableLiveData;
 import android.view.View;
 
 import com.hwx.listApplication.Configuration;
@@ -25,10 +24,11 @@ public class MainViewModel {
 
     private PublishSubject publishSubject;
 
-    public ObservableInt progressBar;
-    public ObservableInt statusLabelVisibility;
-    public ObservableInt objectsRecyclerVisibility;
-    public ObservableField<String> statusLabelText;
+    public MutableLiveData<Integer> progressBar;
+    public MutableLiveData<Integer> statusLabelVisibility;
+    public MutableLiveData<Integer> objectsRecyclerVisibility;
+    public MutableLiveData<String> statusLabelText;
+
 
     public List<FilmSimple> getFilmSimpleList() {
         return filmSimpleList;
@@ -48,12 +48,19 @@ public class MainViewModel {
 
     public MainViewModel() {
         publishSubject = PublishSubject.create();
+        filmSimpleList = new ArrayList<>();
 
-        this.filmSimpleList = new ArrayList<>();
-        progressBar = new ObservableInt(View.GONE);
-        statusLabelVisibility = new ObservableInt(View.VISIBLE);
-        objectsRecyclerVisibility = new ObservableInt(View.GONE);
-        statusLabelText = new ObservableField<>("Нажмите на кнопку, чтобы получить данные");
+        progressBar =  new MutableLiveData<>();
+        progressBar.setValue(View.GONE);
+
+        statusLabelVisibility = new MutableLiveData<>();
+        statusLabelVisibility.setValue(View.VISIBLE);
+
+        objectsRecyclerVisibility = new MutableLiveData<>();
+        objectsRecyclerVisibility.setValue(View.GONE);
+
+        statusLabelText = new MutableLiveData<>();
+        statusLabelText.setValue("Нажмите на кнопку, чтобы получить данные");
     }
 
 
@@ -68,9 +75,9 @@ public class MainViewModel {
     }
 
     private void initializeViews() {
-        statusLabelVisibility.set(View.GONE);
-        objectsRecyclerVisibility.set(View.GONE);
-        progressBar.set(View.VISIBLE);
+        statusLabelVisibility.setValue(View.GONE);
+        objectsRecyclerVisibility.setValue(View.GONE);
+        progressBar.setValue(View.VISIBLE);
     }
 
     private void fetchObjectsList() {
@@ -86,17 +93,17 @@ public class MainViewModel {
                     @Override
                     public void accept(ObjectListResponse objectListResponse) throws Exception {
                         updateFilmsSimpleDataList(objectListResponse.getFilmSimpleList());
-                        progressBar.set(View.GONE);
-                        statusLabelVisibility.set(View.GONE);
-                        objectsRecyclerVisibility.set(View.VISIBLE);
+                        progressBar.setValue(View.GONE);
+                        statusLabelVisibility.setValue(View.GONE);
+                        objectsRecyclerVisibility.setValue(View.VISIBLE);
                     }
 
                 }, new Consumer<Throwable>() {
                 @Override public void accept(Throwable throwable) throws Exception {
-                    statusLabelText.set("Ошибка получения данных!");
-                    progressBar.set(View.GONE);
-                    statusLabelVisibility.set(View.VISIBLE);
-                    objectsRecyclerVisibility.set(View.GONE);
+                    statusLabelText.setValue("Ошибка получения данных!");
+                    progressBar.setValue(View.GONE);
+                    statusLabelVisibility.setValue(View.VISIBLE);
+                    objectsRecyclerVisibility.setValue(View.GONE);
                 }
             });
         compositeDisposable.add(disposable);

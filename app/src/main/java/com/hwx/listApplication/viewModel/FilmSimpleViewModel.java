@@ -47,8 +47,6 @@ public class FilmSimpleViewModel extends BaseObservable {
 
     //вызывается при выборе карточки фильма из списка
     public void onItemClick(final View v){
-        //System.out.println("got click to open "+filmSimple.id);
-
 
         FilmService filmOldService = ApiFactory.create();
 
@@ -58,7 +56,6 @@ public class FilmSimpleViewModel extends BaseObservable {
                 .enqueue(new Callback<FilmDetail>() {
                     @Override
                     public void onResponse(Call<FilmDetail> call, Response<FilmDetail> response) {
-                        //context.startActivity(FilmDetailActivity.fillDetail(v.getContext(), response.body()));
                         uiEventLiveData.setValue(response.body());
                     }
 

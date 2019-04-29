@@ -9,11 +9,12 @@ import com.hwx.listApplication.R;
 import com.hwx.listApplication.adapter.FilmSimpleAdapter;
 import com.hwx.listApplication.databinding.ActivityMainBinding;
 import com.hwx.listApplication.model.FilmDetail;
+import com.hwx.listApplication.model.FilmSimple;
 import com.hwx.listApplication.viewModel.MainViewModel;
 
-import java.util.Observable;
-import java.util.Observer;
+import java.util.List;
 
+import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 
@@ -55,10 +56,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         FilmSimpleAdapter filmSimpleAdapter = new FilmSimpleAdapter(publishSubject, this);
         activityMainBinding.listFilms.setAdapter(filmSimpleAdapter);
 
-        mainViewModel.addObserver(this);
+        mainViewModel.getPublishSubject().subscribeActual(this);
 
-
-        //FilmSimpleAdapter.FilmSimpleViewHolder
     }
 
 
@@ -66,19 +65,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private void initDataBinding() {
         mainViewModel = new MainViewModel();
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        activityMainBinding.setLifecycleOwner(this);
         activityMainBinding.setMainViewModel(mainViewModel);
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        if(o instanceof MainViewModel) {
-            FilmSimpleAdapter filmSimpleAdapter = (FilmSimpleAdapter) activityMainBinding.listFilms.getAdapter();
-            MainViewModel mainViewModel = (MainViewModel) o;
-            filmSimpleAdapter.setFilmSimpleList(mainViewModel.getFilmSimpleList());
 
-
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -86,5 +77,30 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mainViewModel.reset();
         activityMainBinding.listFilms.setAdapter(null);
         activityMainBinding = null;
+    }
+
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+
+    @Override
+    public void onNext(Object o) {
+        FilmSimpleAdapter filmSimpleAdapter = (FilmSimpleAdapter) activityMainBinding.listFilms.getAdapter();
+        filmSimpleAdapter.setFilmSimpleList((List<FilmSimple>)o);
+    }
+
+    @Override
+    public void onError(Throwable e) {
+
+    }
+
+    @Override
+    public void onComplete() {
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 }
