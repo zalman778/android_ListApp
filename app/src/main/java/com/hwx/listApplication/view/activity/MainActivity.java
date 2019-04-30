@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 
+import com.hwx.listApplication.ListApplication;
 import com.hwx.listApplication.R;
 import com.hwx.listApplication.adapter.FilmSimpleAdapter;
 import com.hwx.listApplication.databinding.ActivityMainBinding;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         super.onCreate(savedInstanceState);
         initDataBinding();
 
+        mainViewModel.setResourceProvider(ListApplication.get(getApplicationContext()).getResourceProvider());
         activityMainBinding.listFilms.setLayoutManager(new LinearLayoutManager(this));
 
         //rx
@@ -88,12 +90,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         }
 
-        if (o instanceof FilmDetail)
-            startActivity(FilmDetailActivity.fillDetail(MainActivity.this, (FilmDetail)o));
+        if (o instanceof FilmDetail) {
 
-        if (o instanceof String && ((String)o).equals("show_loader")) {
-
+            startActivity(FilmDetailActivity.fillDetail(MainActivity.this, (FilmDetail) o));
         }
+
     }
 
     @Override
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public void onComplete() {
 
     }
+
 
 
 }

@@ -6,6 +6,8 @@ import android.arch.lifecycle.ViewModel;
 import android.view.View;
 
 import com.hwx.listApplication.Configuration;
+import com.hwx.listApplication.R;
+import com.hwx.listApplication.ResourceProvider;
 import com.hwx.listApplication.model.FilmSimple;
 import com.hwx.listApplication.model.ObjectListResponse;
 import com.hwx.listApplication.service.ApiFactory;
@@ -13,6 +15,7 @@ import com.hwx.listApplication.service.FilmService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -23,12 +26,12 @@ import io.reactivex.subjects.PublishSubject;
 
 public class MainViewModel extends ViewModel {
 
-
-
     public MutableLiveData<Integer> progressBar;
     public MutableLiveData<Integer> statusLabelVisibility;
     public MutableLiveData<Integer> objectsRecyclerVisibility;
     public MutableLiveData<String> statusLabelText;
+
+    private ResourceProvider mResourceProvider;
 
     private List<FilmSimple> filmSimpleList;
 
@@ -36,10 +39,15 @@ public class MainViewModel extends ViewModel {
 
     private PublishSubject subjFilmQuery;  //Observable для запроса списка фильма
 
+    public void setResourceProvider(ResourceProvider mResourceProvider) {
+        this.mResourceProvider = mResourceProvider;
+    }
+
     public MainViewModel() {
         subjFilmQuery = PublishSubject.create();
 
         filmSimpleList = new ArrayList<>();
+
 
         progressBar =  new MutableLiveData<>();
         progressBar.setValue(View.GONE);
@@ -86,8 +94,6 @@ public class MainViewModel extends ViewModel {
     private void fetchObjectsList() {
         FilmService filmService = ApiFactory.create();
 
-
-
         Disposable disposable = filmService
                 .fetchFilmsList(Configuration.getBaseUrlList(1))
                 .subscribeOn(Schedulers.io())
@@ -103,7 +109,7 @@ public class MainViewModel extends ViewModel {
 
                 }, new Consumer<Throwable>() {
                 @Override public void accept(Throwable throwable) throws Exception {
-                    statusLabelText.setValue("Ошибка получения данных!");
+                    statusLabelText.setValue(mResourceProvider.getString(R.string.update_error));
                     progressBar.setValue(View.GONE);
                     statusLabelVisibility.setValue(View.VISIBLE);
                     objectsRecyclerVisibility.setValue(View.GONE);
@@ -133,5 +139,24 @@ public class MainViewModel extends ViewModel {
     public void onResume() {
         if (filmSimpleList.size() > 0)
             subjFilmQuery.onNext(filmSimpleList);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MainViewModel that = (MainViewModel) o;
+        return Objects.equals(progressBar, that.progressBar) &&
+                Objects.equals(statusLabelVisibility, that.statusLabelVisibility) &&
+                Objects.equals(objectsRecyclerVisibility, that.objectsRecyclerVisibility) &&
+                Objects.equals(statusLabelText, that.statusLabelText) &&
+                Objects.equals(filmSimpleList, that.filmSimpleList) &&
+                Objects.equals(compositeDisposable, that.compositeDisposable) &&
+                Objects.equals(subjFilmQuery, that.subjFilmQuery);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(progressBar, statusLabelVisibility, objectsRecyclerVisibility, statusLabelText, filmSimpleList, compositeDisposable, subjFilmQuery);
     }
 }

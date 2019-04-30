@@ -14,6 +14,8 @@ import com.hwx.listApplication.service.ApiFactory;
 import com.hwx.listApplication.service.FilmService;
 import com.livedata.SingleLiveEvent;
 
+import java.util.Objects;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -80,6 +82,20 @@ public class FilmSimpleViewModel extends BaseObservable {
 
     public void setFilmSimple(FilmSimple filmSimple) {
         this.filmSimple = filmSimple;
-        notifyChange();
+        //notifyChange();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FilmSimpleViewModel that = (FilmSimpleViewModel) o;
+        return Objects.equals(filmSimple, that.filmSimple) &&
+                Objects.equals(uiEventLiveData, that.uiEventLiveData);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(filmSimple, uiEventLiveData);
     }
 }
