@@ -39,18 +39,17 @@ public class FilmDetailActivity extends AppCompatActivity {
 
         FilmDetailViewModel filmDetailViewModel = new FilmDetailViewModel(filmDetail);
         activityFilmDetailBinding.setFilmDetailViewModel(filmDetailViewModel);
-        setTitle(filmDetail.title);
+        setTitle(filmDetail.getTitle());
 
 
         Glide.with(this)
                 .asBitmap()
-                .load(Configuration.getImageFullUrl(filmDetail.backdropPath))
+                .load(Configuration.getImageFullUrl(filmDetail.getBackdropPath()))
 
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         Drawable drawable = new BitmapDrawable(context.getResources(), resource);
-                        //yourRelativeLayout.setBackground(drawable);
                         activityFilmDetailBinding.appBarLayout.setBackground(drawable);
                     }
 

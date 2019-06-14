@@ -9,8 +9,6 @@ import com.bumptech.glide.Glide;
 import com.hwx.listApplication.Configuration;
 import com.hwx.listApplication.model.FilmDetail;
 
-import java.util.Objects;
-
 public class FilmDetailViewModel extends ViewModel {
 
     private MutableLiveData<String> backdropPath = new MutableLiveData<>();
@@ -30,22 +28,23 @@ public class FilmDetailViewModel extends ViewModel {
 
 
     public FilmDetailViewModel(
-            FilmDetail filmDetail) {
+            FilmDetail filmDetail
+    ) {
         setFilmDetail(filmDetail);
     }
 
     public void setFilmDetail(FilmDetail filmDetail) {
-        backdropPath.setValue(filmDetail.backdropPath);
-        imageUrl.setValue(Configuration.getImageFullUrl(filmDetail.posterPath));
-        title.setValue(filmDetail.title);
-        originalTitle.setValue(filmDetail.originalTitle);
-        overview.setValue(filmDetail.overview);
-        popularity.setValue(filmDetail.popularity);
-        budget.setValue(filmDetail.budget);
-        releaseDate.setValue(filmDetail.releaseDate);
-        voteAverage.setValue(filmDetail.voteAverage);
-        voteCount.setValue(filmDetail.voteCount);
-        homepage.setValue(filmDetail.homepage);
+        backdropPath.setValue(filmDetail.getBackdropPath());
+        imageUrl.setValue(Configuration.getImageFullUrl(filmDetail.getPosterPath()));
+        title.setValue(filmDetail.getTitle());
+        originalTitle.setValue(filmDetail.getOriginalTitle());
+        overview.setValue(filmDetail.getOverview());
+        popularity.setValue(filmDetail.getPopularity());
+        budget.setValue(filmDetail.getBudget());
+        releaseDate.setValue(filmDetail.getReleaseDate());
+        voteAverage.setValue(filmDetail.getVoteAverage());
+        voteCount.setValue(filmDetail.getVoteCount());
+        homepage.setValue(filmDetail.getHomepage());
     }
 
     public MutableLiveData<String> getTitle() {
@@ -97,26 +96,4 @@ public class FilmDetailViewModel extends ViewModel {
         Glide.with(view.getContext()).load(imageUrl).into(view);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FilmDetailViewModel that = (FilmDetailViewModel) o;
-        return Objects.equals(backdropPath, that.backdropPath) &&
-                Objects.equals(imageUrl, that.imageUrl) &&
-                Objects.equals(title, that.title) &&
-                Objects.equals(originalTitle, that.originalTitle) &&
-                Objects.equals(overview, that.overview) &&
-                Objects.equals(popularity, that.popularity) &&
-                Objects.equals(budget, that.budget) &&
-                Objects.equals(releaseDate, that.releaseDate) &&
-                Objects.equals(voteAverage, that.voteAverage) &&
-                Objects.equals(voteCount, that.voteCount) &&
-                Objects.equals(homepage, that.homepage);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(backdropPath, imageUrl, title, originalTitle, overview, popularity, budget, releaseDate, voteAverage, voteCount, homepage);
-    }
 }

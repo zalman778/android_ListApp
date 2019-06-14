@@ -6,15 +6,55 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class FilmSimple implements Serializable {
-    @SerializedName("id") public Long id;
+    @SerializedName("id") private Long id;
 
-    @SerializedName("vote_average") public Double voteAverage;
+    @SerializedName("vote_average") private Double voteAverage;
 
-    @SerializedName("title") public String title;
+    @SerializedName("title") private String title;
 
-    @SerializedName("popularity") public Double popularity;
+    @SerializedName("popularity") private Double popularity;
 
-    @SerializedName("poster_path") public String posterPath;
+    @SerializedName("poster_path") private String posterPath;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Double getVoteAverage() {
+        return voteAverage;
+    }
+
+    public void setVoteAverage(Double voteAverage) {
+        this.voteAverage = voteAverage;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Double getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(Double popularity) {
+        this.popularity = popularity;
+    }
+
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -1,6 +1,7 @@
 package com.hwx.listApplication.viewModel;
 
 
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.databinding.BindingAdapter;
 import android.view.View;
@@ -11,60 +12,52 @@ import com.hwx.listApplication.Configuration;
 import com.hwx.listApplication.model.FilmSimple;
 import com.livedata.SingleLiveEvent;
 
-import java.util.Objects;
-
 public class FilmSimpleViewModel extends ViewModel {
 
-    private FilmSimple filmSimple;
     private SingleLiveEvent uiEventLiveData = new SingleLiveEvent<Long>();
 
+    private MutableLiveData<String> caption = new MutableLiveData<>();
+    private MutableLiveData<String> imageUrl = new MutableLiveData<>();
+    private MutableLiveData<String> popularity = new MutableLiveData<>();
+
+    private Long filmId;
+
     public FilmSimpleViewModel(FilmSimple filmSimple) {
-        this.filmSimple = filmSimple;
+        setFilmSimple(filmSimple);
+    }
+
+    public void setFilmSimple(FilmSimple filmSimple) {
+        caption.setValue(filmSimple.getTitle());
+        imageUrl.setValue(Configuration.getImageFullUrl(filmSimple.getPosterPath()));
+        popularity.setValue("Рейтинг: "+filmSimple.getPopularity());
+        filmId = filmSimple.getId();
+
     }
 
     public SingleLiveEvent getUiEventLiveData() {
         return uiEventLiveData;
     }
 
-    public String getCaption() {
-        return filmSimple.title;
+    public MutableLiveData<String> getCaption() {
+        return caption;
     }
 
-    public String getImageUrl() {
-        return Configuration.getImageFullUrl(filmSimple.posterPath);
+    public MutableLiveData<String> getImageUrl() {
+        return imageUrl;
     }
 
-    public String getPopularity() {
-        return "Рейтинг: "+filmSimple.popularity;
+    public MutableLiveData<String> getPopularity() {
+        return popularity;
     }
 
     //вызывается при выборе карточки фильма из списка
     public void onItemClick(final View v){
-        uiEventLiveData.setValue(filmSimple.id);
+        uiEventLiveData.setValue(filmId);
     }
 
     // Loading Image using Glide Library.
     @BindingAdapter("imageUrl")
     public static void setImageUrl(ImageView imageView, String url){
         Glide.with(imageView.getContext()).load(url).into(imageView);
-    }
-
-    public void setFilmSimple(FilmSimple filmSimple) {
-        this.filmSimple = filmSimple;
-        //notifyChange();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FilmSimpleViewModel that = (FilmSimpleViewModel) o;
-        return Objects.equals(filmSimple, that.filmSimple) &&
-                Objects.equals(uiEventLiveData, that.uiEventLiveData);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(filmSimple, uiEventLiveData);
     }
 }

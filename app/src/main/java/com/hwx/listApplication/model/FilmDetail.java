@@ -7,29 +7,117 @@ import java.util.Objects;
 
 public class FilmDetail implements Serializable {
 
-    @SerializedName("backdrop_path") public String backdropPath;
+    @SerializedName("backdrop_path") private String backdropPath;
 
-    @SerializedName("poster_path") public String posterPath;
+    @SerializedName("poster_path") private String posterPath;
 
     //in card:
 
-    @SerializedName("title") public String title;
+    @SerializedName("title") private String title;
 
-    @SerializedName("original_title") public String originalTitle;
+    @SerializedName("original_title") private String originalTitle;
 
-    @SerializedName("overview") public String overview;
+    @SerializedName("overview") private String overview;
 
-    @SerializedName("popularity") public Double popularity;
+    @SerializedName("popularity") private Double popularity;
 
-    @SerializedName("budget") public Long budget;
+    @SerializedName("budget") private Long budget;
 
-    @SerializedName("release_date") public String releaseDate;
+    @SerializedName("release_date") private String releaseDate;
 
-    @SerializedName("vote_average") public Double voteAverage;
+    @SerializedName("vote_average") private Double voteAverage;
 
-    @SerializedName("vote_count") public Integer voteCount;
+    @SerializedName("vote_count") private Integer voteCount;
 
-    @SerializedName("homepage") public String homepage;
+    @SerializedName("homepage") private String homepage;
+
+    public String getBackdropPath() {
+        return backdropPath;
+    }
+
+    public void setBackdropPath(String backdropPath) {
+        this.backdropPath = backdropPath;
+    }
+
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getOriginalTitle() {
+        return originalTitle;
+    }
+
+    public void setOriginalTitle(String originalTitle) {
+        this.originalTitle = originalTitle;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
+
+    public Double getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(Double popularity) {
+        this.popularity = popularity;
+    }
+
+    public Long getBudget() {
+        return budget;
+    }
+
+    public void setBudget(Long budget) {
+        this.budget = budget;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public Double getVoteAverage() {
+        return voteAverage;
+    }
+
+    public void setVoteAverage(Double voteAverage) {
+        this.voteAverage = voteAverage;
+    }
+
+    public Integer getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(Integer voteCount) {
+        this.voteCount = voteCount;
+    }
+
+    public String getHomepage() {
+        return homepage;
+    }
+
+    public void setHomepage(String homepage) {
+        this.homepage = homepage;
+    }
 
     @Override
     public boolean equals(Object o) {
