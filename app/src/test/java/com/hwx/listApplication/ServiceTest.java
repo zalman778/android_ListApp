@@ -17,8 +17,6 @@ import io.reactivex.subscribers.TestSubscriber;
 
 public class ServiceTest {
 
-//    @Mock
-//    Context context;
 
     @Before
     public void init(){
@@ -28,8 +26,7 @@ public class ServiceTest {
 
     @Test
     public void checkFilmsListJson() {
-        //when(context.getApplicationContext()).thenReturn(new ListApplication());
-        //ListApplication appController = ApiFactory.create();
+
         FilmService filmService = ApiFactory.create();
 
         TestSubscriber<ObjectListResponse> testSubscriber = new TestSubscriber<>();
@@ -50,8 +47,7 @@ public class ServiceTest {
 
     @Test
     public void checkFilmDetailJson() {
-        //when(context.getApplicationContext()).thenReturn(new ListApplication());
-        //ListApplication appController = ListApplication.create(context);
+
         FilmService filmService = ApiFactory.create();
 
         TestSubscriber<ObjectListResponse> testSubscriber = new TestSubscriber<>();

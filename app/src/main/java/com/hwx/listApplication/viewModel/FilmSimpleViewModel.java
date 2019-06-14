@@ -1,39 +1,29 @@
 package com.hwx.listApplication.viewModel;
 
 
-import android.databinding.BaseObservable;
+import android.arch.lifecycle.ViewModel;
 import android.databinding.BindingAdapter;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.hwx.listApplication.Configuration;
-import com.hwx.listApplication.model.FilmDetail;
 import com.hwx.listApplication.model.FilmSimple;
-import com.hwx.listApplication.service.FilmService;
 import com.livedata.SingleLiveEvent;
 
 import java.util.Objects;
 
-public class FilmSimpleViewModel extends BaseObservable {
+public class FilmSimpleViewModel extends ViewModel {
 
     private FilmSimple filmSimple;
-
-    private SingleLiveEvent uiEventLiveData;
+    private SingleLiveEvent uiEventLiveData = new SingleLiveEvent<Long>();
 
     public FilmSimpleViewModel(FilmSimple filmSimple) {
         this.filmSimple = filmSimple;
-        uiEventLiveData = new SingleLiveEvent<Long>();
     }
-
-
 
     public SingleLiveEvent getUiEventLiveData() {
         return uiEventLiveData;
-    }
-
-    public void setUiEventLiveData(SingleLiveEvent uiEventLiveData) {
-        this.uiEventLiveData = uiEventLiveData;
     }
 
     public String getCaption() {
@@ -41,7 +31,6 @@ public class FilmSimpleViewModel extends BaseObservable {
     }
 
     public String getImageUrl() {
-
         return Configuration.getImageFullUrl(filmSimple.posterPath);
     }
 
@@ -52,21 +41,6 @@ public class FilmSimpleViewModel extends BaseObservable {
     //вызывается при выборе карточки фильма из списка
     public void onItemClick(final View v){
         uiEventLiveData.setValue(filmSimple.id);
-
-//        //checking via Call:
-//        filmService.fetchFilmDetail(Configuration.getMovieFullInfoUrl(filmSimple.id))
-//                .enqueue(new Callback<FilmDetail>() {
-//                    @Override
-//                    public void onResponse(Call<FilmDetail> call, Response<FilmDetail> response) {
-//                        uiEventLiveData.setValue(response.body());
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<FilmDetail> call, Throwable t) {
-//                        Log.e("AVX", "err", t);
-//                    }
-//                });
-
     }
 
     // Loading Image using Glide Library.
@@ -74,8 +48,6 @@ public class FilmSimpleViewModel extends BaseObservable {
     public static void setImageUrl(ImageView imageView, String url){
         Glide.with(imageView.getContext()).load(url).into(imageView);
     }
-
-
 
     public void setFilmSimple(FilmSimple filmSimple) {
         this.filmSimple = filmSimple;
