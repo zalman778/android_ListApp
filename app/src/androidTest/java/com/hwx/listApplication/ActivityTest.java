@@ -30,7 +30,7 @@ public class ActivityTest {
 
     @Test
     public void checkListLoadsInActivity() {
-        onView(withId(R.id.fab)).perform(click());
+//        onView(withId(R.id.fab)).perform(click());
         SystemClock.sleep(3000);
         //проверяем на наличие фильмов в списке
         assertTrue("Has films in lits", getRVcount() > 0);
