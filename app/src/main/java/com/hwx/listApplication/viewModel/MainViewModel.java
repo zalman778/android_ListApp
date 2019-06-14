@@ -3,11 +3,12 @@ package com.hwx.listApplication.viewModel;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.util.Log;
 import android.view.View;
 
 import com.hwx.listApplication.Configuration;
-import com.hwx.listApplication.R;
 import com.hwx.listApplication.ResourceProvider;
+import com.hwx.listApplication.model.FilmDetail;
 import com.hwx.listApplication.model.FilmSimple;
 import com.hwx.listApplication.model.ObjectListResponse;
 import com.hwx.listApplication.service.ApiFactory;
@@ -15,68 +16,102 @@ import com.hwx.listApplication.service.FilmService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainViewModel extends ViewModel {
 
-    public MutableLiveData<Integer> progressBar;
-    public MutableLiveData<Integer> statusLabelVisibility;
-    public MutableLiveData<Integer> objectsRecyclerVisibility;
-    public MutableLiveData<String> statusLabelText;
+
+    private MutableLiveData<Boolean> lvIsFilmListLoading = new MutableLiveData<>();
+    private MutableLiveData<Integer> lvObjectsRecyclerVisibility = new MutableLiveData<>();
 
     private ResourceProvider mResourceProvider;
+    private FilmService filmService = ApiFactory.create();
 
-    private List<FilmSimple> filmSimpleList;
+    private List<FilmSimple> filmSimpleList = new ArrayList<>();
 
-    private CompositeDisposable compositeDisposable;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    private PublishSubject subjFilmQuery;  //Observable для запроса списка фильма
+    private PublishSubject<List<FilmSimple>> psFilmSimpleList = PublishSubject.create();
+    private PublishSubject<Long> psFilmSelected = PublishSubject.create();
+    private PublishSubject<FilmDetail> psFilmSelectedWithData = PublishSubject.create();
 
     public void setResourceProvider(ResourceProvider mResourceProvider) {
         this.mResourceProvider = mResourceProvider;
     }
 
     public MainViewModel() {
-        subjFilmQuery = PublishSubject.create();
+        lvObjectsRecyclerVisibility.setValue(View.GONE);
 
-        filmSimpleList = new ArrayList<>();
+        compositeDisposable.add(
+            psFilmSelected
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Long>() {
+                        @Override
+                        public void accept(Long filmId) throws Exception {
+                            requestDataByFilmId(filmId);
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            Log.e("AVX", "err", throwable);
+                        }
+                    })
+        );
 
+        //load list
+        onClick();
+    }
 
-        progressBar =  new MutableLiveData<>();
-        progressBar.setValue(View.GONE);
+    private void requestDataByFilmId(Long filmId) {
+        filmService
+            .fetchFilmDetail(Configuration.getMovieFullInfoUrl(filmId))
+            .enqueue(new Callback<FilmDetail>() {
+                @Override
+                public void onResponse(Call<FilmDetail> call, Response<FilmDetail> response) {
+                     psFilmSelectedWithData.onNext(response.body());
+                }
 
-        statusLabelVisibility = new MutableLiveData<>();
-        statusLabelVisibility.setValue(View.VISIBLE);
+                @Override
+                public void onFailure(Call<FilmDetail> call, Throwable t) {
+                    Log.e("AVX", "err", t);
+                }
+            });
+    }
 
-        objectsRecyclerVisibility = new MutableLiveData<>();
-        objectsRecyclerVisibility.setValue(View.GONE);
+    public MutableLiveData<Boolean> getLvIsFilmListLoading() {
+        return lvIsFilmListLoading;
+    }
 
-        compositeDisposable = new CompositeDisposable();
-
-        statusLabelText = new MutableLiveData<>();
-        statusLabelText.setValue("Нажмите на кнопку, чтобы получить данные");
+    public MutableLiveData<Integer> getLvObjectsRecyclerVisibility() {
+        return lvObjectsRecyclerVisibility;
     }
 
     public List<FilmSimple> getFilmSimpleList() {
         return filmSimpleList;
     }
 
-    public PublishSubject getSubjFilmQuery() {
-        return subjFilmQuery;
+    public PublishSubject<List<FilmSimple>> getPsFilmSimpleList() {
+        return psFilmSimpleList;
     }
 
-    public void setSubjFilmQuery(PublishSubject subjFilmQuery) {
-        this.subjFilmQuery = subjFilmQuery;
+    public PublishSubject<Long> getPsFilmSelected() {
+        return psFilmSelected;
     }
 
-    public void onClick(View view) {
+    public PublishSubject<FilmDetail> getPsFilmSelectedWithData() {
+        return psFilmSelectedWithData;
+    }
+
+    public void onClick() {
         reloadData();
     }
 
@@ -86,15 +121,16 @@ public class MainViewModel extends ViewModel {
     }
 
     private void initializeViews() {
-        statusLabelVisibility.setValue(View.GONE);
-        objectsRecyclerVisibility.setValue(View.GONE);
-        progressBar.setValue(View.VISIBLE);
+        lvIsFilmListLoading.setValue(false);
+        lvObjectsRecyclerVisibility.setValue(View.GONE);
     }
 
     private void fetchObjectsList() {
-        FilmService filmService = ApiFactory.create();
 
-        Disposable disposable = filmService
+        lvIsFilmListLoading.setValue(true);
+
+        compositeDisposable.add(
+            filmService
                 .fetchFilmsList(Configuration.getBaseUrlList(1))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -102,61 +138,35 @@ public class MainViewModel extends ViewModel {
                     @Override
                     public void accept(ObjectListResponse objectListResponse) throws Exception {
                         updateFilmsSimpleDataList(objectListResponse.getFilmSimpleList());
-                        progressBar.setValue(View.GONE);
-                        statusLabelVisibility.setValue(View.GONE);
-                        objectsRecyclerVisibility.setValue(View.VISIBLE);
+                        lvObjectsRecyclerVisibility.setValue(View.VISIBLE);
+                        lvIsFilmListLoading.setValue(false);
                     }
 
                 }, new Consumer<Throwable>() {
                 @Override public void accept(Throwable throwable) throws Exception {
-                    statusLabelText.setValue(mResourceProvider.getString(R.string.update_error));
-                    progressBar.setValue(View.GONE);
-                    statusLabelVisibility.setValue(View.VISIBLE);
-                    objectsRecyclerVisibility.setValue(View.GONE);
-                }
-            });
-        compositeDisposable.add(disposable);
+                        Log.w("AVX", "err", throwable);
+                        lvObjectsRecyclerVisibility.setValue(View.GONE);
+                    }
+                })
+        );
     }
 
     private void updateFilmsSimpleDataList(List<FilmSimple> pFilmSimpleList) {
         filmSimpleList.addAll(pFilmSimpleList);
-        subjFilmQuery.onNext(filmSimpleList);
-
-    }
-
-    public void reset() {
-        //unSubscribeFromObservable();
-        //compositeDisposable = null;
-    }
-
-    private void unSubscribeFromObservable() {
-        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
-            compositeDisposable.dispose();
-        }
+        psFilmSimpleList.onNext(filmSimpleList);
     }
 
 
     public void onResume() {
         if (filmSimpleList.size() > 0)
-            subjFilmQuery.onNext(filmSimpleList);
+            psFilmSimpleList.onNext(filmSimpleList);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MainViewModel that = (MainViewModel) o;
-        return Objects.equals(progressBar, that.progressBar) &&
-                Objects.equals(statusLabelVisibility, that.statusLabelVisibility) &&
-                Objects.equals(objectsRecyclerVisibility, that.objectsRecyclerVisibility) &&
-                Objects.equals(statusLabelText, that.statusLabelText) &&
-                Objects.equals(filmSimpleList, that.filmSimpleList) &&
-                Objects.equals(compositeDisposable, that.compositeDisposable) &&
-                Objects.equals(subjFilmQuery, that.subjFilmQuery);
+    protected void onCleared() {
+        super.onCleared();
+        compositeDisposable.dispose();
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(progressBar, statusLabelVisibility, objectsRecyclerVisibility, statusLabelText, filmSimpleList, compositeDisposable, subjFilmQuery);
-    }
+
 }

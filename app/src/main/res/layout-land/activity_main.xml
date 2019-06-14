@@ -33,55 +33,76 @@
                 android:orientation="vertical"
                 app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
 
-                <ProgressBar
-                    android:id="@+id/progress_bar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:visibility="@{mainViewModel.progressBar}" />
-
-
-
-
-
-
-                    <TextView
-                        android:id="@+id/label_status"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@{mainViewModel.statusLabelText}"
-                        app:visibility="@{mainViewModel.statusLabelVisibility}" />
-
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/list_films"
+                <android.support.v4.widget.SwipeRefreshLayout
+                    android:id="@+id/swiperefresh_items"
+                    app:refreshing="@{mainViewModel.lvIsFilmListLoading}"
+                    app:onRefreshListener="@{() -> mainViewModel.onClick()}"
                     android:layout_width="match_parent"
-                    android:layout_height="653dp"
-                    android:background="@color/colorWhite"
-                    android:clipToPadding="false"
-                    android:scrollbars="vertical"
-                    android:layout_marginTop="70dp"
-                    app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior"
-                    app:visibility="@{mainViewModel.objectsRecyclerVisibility}"
-                    tools:listitem="@layout/activity_film_simple" />
+                    android:layout_height="match_parent">
+
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/list_films"
+                        android:layout_width="match_parent"
+                        android:layout_height="653dp"
+                        android:background="@color/colorWhite"
+                        android:clipToPadding="false"
+                        android:scrollbars="vertical"
+                        app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior"
+                        app:visibility="@{mainViewModel.lvObjectsRecyclerVisibility}"
+                        tools:listitem="@layout/activity_film_simple" />
+
+                </android.support.v4.widget.SwipeRefreshLayout>
+
+                <!--<ProgressBar-->
+                    <!--android:id="@+id/progress_bar"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--app:visibility="@{mainViewModel.progressBar}" />-->
+
+
+
+
+
+
+                    <!--<TextView-->
+                        <!--android:id="@+id/label_status"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:gravity="center"-->
+                        <!--android:text="@{mainViewModel.statusLabelText}"-->
+                        <!--app:visibility="@{mainViewModel.statusLabelVisibility}" />-->
+
+
+                <!--<android.support.v7.widget.RecyclerView-->
+                    <!--android:id="@+id/list_films"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="653dp"-->
+                    <!--android:background="@color/colorWhite"-->
+                    <!--android:clipToPadding="false"-->
+                    <!--android:scrollbars="vertical"-->
+                    <!--android:layout_marginTop="70dp"-->
+                    <!--app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior"-->
+                    <!--app:visibility="@{mainViewModel.objectsRecyclerVisibility}"-->
+                    <!--tools:listitem="@layout/activity_film_simple" />-->
 
 
             </LinearLayout>
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:rippleColor="@null"
-                app:backgroundTint="@null"
-                app:fabSize="mini"
-                android:onClick="@{mainViewModel::onClick}"
-                android:src="@drawable/ic_refresh"
-                android:visibility="visible" />
+            <!--<android.support.design.widget.FloatingActionButton-->
+                <!--android:id="@+id/fab"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="bottom|end"-->
+                <!--android:layout_margin="16dp"-->
+                <!--android:clickable="true"-->
+                <!--android:focusable="true"-->
+                <!--app:rippleColor="@null"-->
+                <!--app:backgroundTint="@null"-->
+                <!--app:fabSize="mini"-->
+                <!--android:onClick="@{mainViewModel::onClick}"-->
+                <!--android:src="@drawable/ic_refresh"-->
+                <!--android:visibility="visible" />-->
 
 
 

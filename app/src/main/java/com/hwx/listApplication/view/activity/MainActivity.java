@@ -16,57 +16,35 @@ import com.hwx.listApplication.viewModel.MainViewModel;
 
 import java.util.List;
 
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.PublishSubject;
 
-public class MainActivity extends AppCompatActivity implements Observer {
+public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding activityMainBinding;
     private MainViewModel mainViewModel;
 
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private FilmSimpleAdapter filmSimpleAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         initDataBinding();
 
-        mainViewModel.setResourceProvider(ListApplication.get(getApplicationContext()).getResourceProvider());
-        activityMainBinding.listFilms.setLayoutManager(new LinearLayoutManager(this));
+        initRecyclerViewAdapter();
 
-        //rx
-        PublishSubject<FilmDetail> publishSubject = PublishSubject.create();
-        publishSubject.subscribeActual(this);
-
-        FilmSimpleAdapter filmSimpleAdapter = new FilmSimpleAdapter(publishSubject, this);
-        activityMainBinding.listFilms.setAdapter(filmSimpleAdapter);
-
-
-        mainViewModel.getSubjFilmQuery().subscribeActual(this);
-        activityMainBinding.executePendingBindings();
-
+        subscribePublishers();
     }
-
-
-
-    private void initDataBinding() {
-        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        activityMainBinding.setLifecycleOwner(this);
-        activityMainBinding.setMainViewModel(mainViewModel);
-    }
-
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mainViewModel.reset();
-        activityMainBinding.listFilms.setAdapter(null);
-        activityMainBinding = null;
-        //отписка не срабатывает почему-то
-        mainViewModel.getSubjFilmQuery().unsubscribeOn(Schedulers.io());
-
+        compositeDisposable.dispose();
     }
 
     @Override
@@ -75,37 +53,52 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mainViewModel.onResume();
     }
 
-    @Override
-    public void onSubscribe(Disposable d) {
+
+
+    private void initDataBinding() {
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mainViewModel.setResourceProvider(ListApplication.get(getApplicationContext()).getResourceProvider());
+        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        activityMainBinding.setLifecycleOwner(this);
+        activityMainBinding.setMainViewModel(mainViewModel);
     }
 
-    @Override
-    public void onNext(Object o) {
-        //обрабатываем события он момента завершения загрузки данных и от выбора фильма из списка
-        //надо исправить, почему-то после повотора старая активити получает событие, а у неё уже пустой список.
-        if (o instanceof List) {
-            if (activityMainBinding != null) {
-                FilmSimpleAdapter filmSimpleAdapter = (FilmSimpleAdapter) activityMainBinding.listFilms.getAdapter();
-                filmSimpleAdapter.setFilmSimpleList((List<FilmSimple>) o);
-            }
-        }
-
-        if (o instanceof FilmDetail) {
-
-            startActivity(FilmDetailActivity.fillDetail(MainActivity.this, (FilmDetail) o));
-        }
-
+    private void initRecyclerViewAdapter() {
+        activityMainBinding.listFilms.setLayoutManager(new LinearLayoutManager(this));
+        filmSimpleAdapter = new FilmSimpleAdapter(mainViewModel.getPsFilmSelected(), this);
+        activityMainBinding.listFilms.setAdapter(filmSimpleAdapter);
     }
 
-    @Override
-    public void onError(Throwable e) {
+    private void subscribePublishers() {
+        //слушаем события от вью модели
+        compositeDisposable.add(
+                mainViewModel.getPsFilmSelectedWithData()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<FilmDetail>() {
+                            @Override
+                            public void accept(FilmDetail filmDetail) throws Exception {
+                                startActivity(FilmDetailActivity.fillDetail(MainActivity.this, filmDetail));
+                            }
+                        })
+        );
 
+        compositeDisposable.add(
+                mainViewModel
+                        .getPsFilmSimpleList()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<List<FilmSimple>>() {
+                            @Override
+                            public void accept(List<FilmSimple> filmList) throws Exception {
+                                filmSimpleAdapter.setFilmSimpleList(filmList);
+                            }
+                        })
+        );
     }
 
-    @Override
-    public void onComplete() {
 
-    }
+
 
 
 

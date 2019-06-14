@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 
 import com.hwx.listApplication.R;
 import com.hwx.listApplication.databinding.ActivityFilmSimpleBinding;
-import com.hwx.listApplication.model.FilmDetail;
 import com.hwx.listApplication.model.FilmSimple;
 import com.hwx.listApplication.viewModel.FilmSimpleViewModel;
 
@@ -23,7 +22,7 @@ import io.reactivex.subjects.PublishSubject;
 public class FilmSimpleAdapter extends RecyclerView.Adapter<FilmSimpleAdapter.FilmSimpleViewHolder> {
 
     private List<FilmSimple> filmSimpleList;
-    private PublishSubject<FilmDetail> publishSubject;
+    private PublishSubject<Long> psFilmSelected;
     private LifecycleOwner lifecycleOwner;
 
 
@@ -33,11 +32,11 @@ public class FilmSimpleAdapter extends RecyclerView.Adapter<FilmSimpleAdapter.Fi
     }
 
     public FilmSimpleAdapter(
-              PublishSubject<FilmDetail> publishSubject
+              PublishSubject<Long> psFilmSelected
             , LifecycleOwner lifecycleOwner
     ) {
         this.filmSimpleList = new ArrayList<>();
-        this.publishSubject = publishSubject;
+        this.psFilmSelected = psFilmSelected;
         this.lifecycleOwner = lifecycleOwner;
     }
 
@@ -58,7 +57,7 @@ public class FilmSimpleAdapter extends RecyclerView.Adapter<FilmSimpleAdapter.Fi
 
     @Override
     public void onBindViewHolder(@NonNull FilmSimpleViewHolder filmSimpleViewHolder, int i) {
-        filmSimpleViewHolder.bindFilmSimple(filmSimpleList.get(i), publishSubject, lifecycleOwner);
+        filmSimpleViewHolder.bindFilmSimple(filmSimpleList.get(i), psFilmSelected, lifecycleOwner);
     }
 
     public static class FilmSimpleViewHolder extends RecyclerView.ViewHolder {
@@ -72,15 +71,19 @@ public class FilmSimpleAdapter extends RecyclerView.Adapter<FilmSimpleAdapter.Fi
 
         void bindFilmSimple(
                 FilmSimple filmSimple
-                , final PublishSubject<FilmDetail> publishSubject
+                , final PublishSubject<Long> publishSubject
                 , LifecycleOwner lifecycleOwner
         ) {
             if (filmSimpleObjectBinding.getFilmSimpleViewModel() == null) {
                 FilmSimpleViewModel filmSimpleViewModel = new FilmSimpleViewModel(filmSimple);
-                filmSimpleViewModel.getUiEventLiveData().observe(lifecycleOwner, new Observer() {
+
+                //собираем события о выборе фильма
+                filmSimpleViewModel
+                        .getUiEventLiveData()
+                        .observe(lifecycleOwner, new Observer<Long>() {
                     @Override
-                    public void onChanged(@Nullable Object o) {
-                        publishSubject.onNext((FilmDetail)o);
+                    public void onChanged(@Nullable Long o) {
+                        publishSubject.onNext(o);
                     }
                 });
 

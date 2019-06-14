@@ -36,12 +36,12 @@ public class FilmDetailActivity extends AppCompatActivity {
 
 
         FilmDetail filmDetail = (FilmDetail) getIntent().getSerializableExtra(EXTRA_FILM_DETAIL);
+
         FilmDetailViewModel filmDetailViewModel = new FilmDetailViewModel(filmDetail);
         activityFilmDetailBinding.setFilmDetailViewModel(filmDetailViewModel);
         setTitle(filmDetail.title);
 
-        //loading background image into appbarlayout;
-        //activityFilmDetailBinding.appBarLayout
+
         Glide.with(this)
                 .asBitmap()
                 .load(Configuration.getImageFullUrl(filmDetail.backdropPath))

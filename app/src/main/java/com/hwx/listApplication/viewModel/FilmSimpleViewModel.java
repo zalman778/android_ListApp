@@ -10,21 +10,23 @@ import com.bumptech.glide.Glide;
 import com.hwx.listApplication.Configuration;
 import com.hwx.listApplication.model.FilmDetail;
 import com.hwx.listApplication.model.FilmSimple;
-import com.hwx.listApplication.service.ApiFactory;
 import com.hwx.listApplication.service.FilmService;
 import com.livedata.SingleLiveEvent;
 
 import java.util.Objects;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class FilmSimpleViewModel extends BaseObservable {
 
     private FilmSimple filmSimple;
 
     private SingleLiveEvent uiEventLiveData;
+
+    public FilmSimpleViewModel(FilmSimple filmSimple) {
+        this.filmSimple = filmSimple;
+        uiEventLiveData = new SingleLiveEvent<Long>();
+    }
+
+
 
     public SingleLiveEvent getUiEventLiveData() {
         return uiEventLiveData;
@@ -49,23 +51,21 @@ public class FilmSimpleViewModel extends BaseObservable {
 
     //вызывается при выборе карточки фильма из списка
     public void onItemClick(final View v){
+        uiEventLiveData.setValue(filmSimple.id);
 
-        FilmService filmOldService = ApiFactory.create();
-
-
-        //checking via Call:
-        filmOldService.fetchFilmDetail(Configuration.getMovieFullInfoUrl(filmSimple.id))
-                .enqueue(new Callback<FilmDetail>() {
-                    @Override
-                    public void onResponse(Call<FilmDetail> call, Response<FilmDetail> response) {
-                        uiEventLiveData.setValue(response.body());
-                    }
-
-                    @Override
-                    public void onFailure(Call<FilmDetail> call, Throwable t) {
-                        int j = 1;
-                    }
-                });
+//        //checking via Call:
+//        filmService.fetchFilmDetail(Configuration.getMovieFullInfoUrl(filmSimple.id))
+//                .enqueue(new Callback<FilmDetail>() {
+//                    @Override
+//                    public void onResponse(Call<FilmDetail> call, Response<FilmDetail> response) {
+//                        uiEventLiveData.setValue(response.body());
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<FilmDetail> call, Throwable t) {
+//                        Log.e("AVX", "err", t);
+//                    }
+//                });
 
     }
 
@@ -75,10 +75,7 @@ public class FilmSimpleViewModel extends BaseObservable {
         Glide.with(imageView.getContext()).load(url).into(imageView);
     }
 
-    public FilmSimpleViewModel(FilmSimple filmSimple) {
-        this.filmSimple = filmSimple;
-        uiEventLiveData = new SingleLiveEvent<FilmDetail>();
-    }
+
 
     public void setFilmSimple(FilmSimple filmSimple) {
         this.filmSimple = filmSimple;
